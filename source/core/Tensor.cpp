@@ -390,6 +390,8 @@ int Tensor::size() const {
     MNN_ASSERT(dataSize >= 1);
     for (int i = 0; i < this->buffer().dimensions; i++) {
         int currentDimSize = mBuffer.dim[i].extent;
+//        if (currentDimSize == 0)
+//            currentDimSize = 1;
         if (mDescribe->dimensionFormat == MNN_DATA_FORMAT_NC4HW4 && 1 == i) {
             currentDimSize = ALIGN_UP4(currentDimSize);
         }

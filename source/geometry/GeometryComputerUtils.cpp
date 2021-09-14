@@ -143,7 +143,15 @@ ErrorCode GeometryComputerUtils::shapeComputeAndGeometryTransform(
     for (auto& info : infos) {
         auto res = SizeComputer::computeOutputSize(info.op, info.inputs, info.outputs);
         if (!res) {
-            MNN_ERROR("Compute Shape Error for %s\n", info.op->name()->c_str());
+            MNN_ERROR("Compute Shape Error: name %s, type %d\n", info.op->name()->c_str(), info.op->type());
+            printf("Input\n");
+            for(auto& input : info.inputs) {
+                input->printShape();
+            }
+            printf("Output\n");
+            for(auto& output : info.outputs) {
+                output->printShape();
+            }
             return COMPUTE_SIZE_ERROR;
         }
         // FIXME: Find better way to may compability for old model

@@ -134,13 +134,13 @@ std::vector<float> doBench(Model& model, int loop, int warmup = 10, int forward 
 
     std::vector<float> costs;
     MNN::Session* session = net->createSession(config);
-    net->releaseModel();
+    //net->releaseModel();
     MNN::Tensor* input    = net->getSessionInput(session, NULL);
 
     // if the model has not the input dimension, umcomment the below code to set the input dims
-    // std::vector<int> dims{1, 3, 224, 224};
-    // net->resizeTensor(input, dims);
-    // net->resizeSession(session);
+    std::vector<int> dims{1, 3, 224, 224};
+    net->resizeTensor(input, dims);
+    net->resizeSession(session);
 
     const MNN::Backend* inBackend = net->getBackend(session, input);
 
@@ -383,6 +383,8 @@ int main(int argc, const char* argv[]) {
     int precision = 2;
     float sparsity = 0.0f;
     int sparseBlockOC = 1;
+    int start_id = 0;
+
     if (argc <= 2) {
         std::cout << "Usage: " << argv[0] << " models_folder [loop_count] [warmup] [forwardtype] [numberThread] [precision] [weightSparsity]" << std::endl;
         return 1;
@@ -412,6 +414,9 @@ int main(int argc, const char* argv[]) {
         sparseBlockOC = atoi(argv[8]);
     }
 
+    if(argc >= 10) {
+        start_id = atoi(argv[9]);
+    }
     std::cout << "Forward type: **" << forwardType(forward) << "** thread=" << numberThread << "** precision=" <<precision << "** sparsity=" <<sparsity << "** sparseBlockOC=" << sparseBlockOC << std::endl;
     std::vector<Model> models = findModelFiles(argv[1]);
 
@@ -419,9 +424,16 @@ int main(int argc, const char* argv[]) {
 
     /* not called yet */
     // set_cpu_affinity();
-
+    
+    int index = 0;
+    printf("start_id: %d\n", start_id);
     for (auto& m : models) {
+        index++;
+        if(index < start_id) {
+            continue;
+        }
         std::vector<float> costs = doBench(m, loop, warmup, forward, false, numberThread, precision, sparsity, sparseBlockOC);
+
         displayStats(m.name, costs);
     }
 }

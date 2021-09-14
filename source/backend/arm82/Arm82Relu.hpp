@@ -11,6 +11,8 @@
 #define Arm82Relu_hpp
 #include <stddef.h>
 
+#include <cstddef>
+
 namespace MNN {
 
 class Arm82Relu {
